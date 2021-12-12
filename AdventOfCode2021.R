@@ -6,7 +6,8 @@
 
 # How many measurements are larger than the previous measurement?
 
-oceandeep   <- read.table("oceandeep.txt")
+oceandeep   <- read.table("inputs/input_d01.txt")
+n_cases     <- nrow(oceandeep)
 differences <- diff(oceandeep$V1)
 result      <- sum(differences > 0)
 result
@@ -19,16 +20,16 @@ rm(differences, result)
 
 odeep_aggre <- sum(oceandeep$V1[1:3])
 
-for (i in 2:1998) {
+for (i in 2:(n_cases - 2)) {
   odeep_aggre[i] <- sum(oceandeep$V1[i:(i+2)])
 }
 rm(i)
 
 # Same result but without a loop.
 
-odeep_aggre <- oceandeep$V1[1:1998] + 
-               oceandeep$V1[2:1999] + 
-               oceandeep$V1[3:2000]
+odeep_aggre <- oceandeep$V1[1:(n_cases - 2)] + 
+               oceandeep$V1[2:(n_cases - 1)] + 
+               oceandeep$V1[3:(n_cases)]
 
 differences <- diff(odeep_aggre)
 result      <- sum(differences > 0)
@@ -53,8 +54,8 @@ rm(list = ls())
 # planned course. What do you get if you multiply your final horizontal position 
 # by your final depth?
 
-movement <- read.table("movement.txt") 
-
+movement <- read.table("inputs/input_d02.txt") 
+n_cases  <- nrow(movement)
 mov_sum  <- tapply(movement$V2, movement$V1, sum)
 
 result   <- mov_sum["forward"] * (mov_sum["down"] - mov_sum["up"])
@@ -92,7 +93,7 @@ rm(result, mov_sum)
 
 aim <- depth <- position <- 0
 
-for (i in 1:1000) {
+for (i in 1:n_cases) {
   if (movement$V1[i] == "forward") {
     position <- position + movement$V2[i]
     depth    <- depth + aim * movement$V2[i]
@@ -128,14 +129,17 @@ rm(list = ls())
 # and epsilon rate, then multiply them together. What is the power consumption 
 # of the submarine? (Be sure to represent your answer in decimal, not binary.)
 
-powerdata  <- read.fwf("powerdata.txt", rep(1, 12))
+library(compositions)
 
+n_bytes    <- nchar(readLines("inputs/input_d03.txt", 1))
+powerdata  <- read.fwf("inputs/input_d03.txt", rep(1, n_bytes))
+n_cases    <- nrow(powerdata)
 countbytes <- apply(powerdata, 2, sum)
 
-gamma_rate <- paste0(ifelse(countbytes > 500, 1, 0), collapse = "")
-epsil_rate <- paste0(ifelse(countbytes > 500, 0, 1), collapse = "")
+gamma_rate <- paste0(ifelse(countbytes > (n_cases/2), 1, 0), collapse = "")
+epsil_rate <- paste0(ifelse(countbytes > (n_cases/2), 0, 1), collapse = "")
 
-result <- compositions::unbinary(gamma_rate) * compositions::unbinary(epsil_rate)
+result <- unbinary(gamma_rate) * unbinary(epsil_rate)
 result
 
 rm(countbytes, gamma_rate, epsil_rate, result)
@@ -206,7 +210,7 @@ rm(countbytes, gamma_rate, epsil_rate, result)
 oxygen_rate <- powerdata
 
 i <- 0
-while (dim(oxygen_rate)[1] != 1) {
+while (nrow(oxygen_rate) != 1) {
   i <- i + 1
   countbytes <- table(oxygen_rate[, i])
   if (diff(countbytes) != 0) {
@@ -221,7 +225,7 @@ rm(i, countbytes, more)
 co2_rate <- powerdata
 
 i <- 0
-while (dim(co2_rate)[1] != 1) {
+while (nrow(co2_rate) != 1) {
   i <- i + 1
   countbytes <- table(co2_rate[, i])
   if (diff(countbytes) != 0) {
@@ -236,7 +240,95 @@ rm(i, countbytes, less)
 oxygen_rate <- paste0(oxygen_rate, collapse = "")
 co2_rate    <- paste0(co2_rate, collapse = "")
 
-result <- compositions::unbinary(oxygen_rate) * compositions::unbinary(co2_rate)
+result <- unbinary(oxygen_rate) * unbinary(co2_rate)
+result
+
+rm(list = ls())
+detach("package:compositions")
+
+# Challege #4.1 ----
+
+# At this point, the third board wins because it has at least one complete row or 
+# column of marked numbers (in this case, the entire top row is marked: 14 21 17 
+# 24 4).
+# The score of the winning board can now be calculated. Start by finding the sum 
+# of all unmarked numbers on that board; in this case, the sum is 188. Then, 
+# multiply that sum by the number that was just called when the board won, 24, 
+# to get the final score, 188 * 24 = 4512.
+
+# Read drawn numbers
+tmp   <- tempfile()
+cat(readLines("inputs/input_d04.txt", n = 1), "\n", file = tmp)
+draws <- c(as.matrix(read.table(tmp, sep = ",")))
+unlink(tmp)
+rm(tmp)
+
+# Read boards
+boards_stacked <- read.table("inputs/input_d04.txt", skip = 1)
+n_rows         <- nrow(boards_stacked)
+n_cols         <- ncol(boards_stacked)
+n_boards       <- n_rows / n_cols
+board_ind      <- rep(1:n_boards, each = n_cols)
+
+boards      <- t(boards_stacked)
+dim(boards) <- c(n_cols, n_cols, n_boards)
+boards      <- aperm(boards, perm = c(2, 1, 3))
+rm(boards_stacked, board_ind, n_rows)
+
+bingo       <- replicate(n_boards, matrix(0, 5, 5))
+
+for (i in 1:length(draws)) {
+  bingo[which(boards == draws[i])] <- 1
+  if (any(apply(bingo, c(1, 3), sum) == n_cols) |
+      any(apply(bingo, c(2, 3), sum) == n_cols)){
+    break
+  }
+}
+
+winner <- which(apply(bingo, 3, function(x) {
+  any(apply(x, 1, sum) == n_cols) | any(apply(x, 2, sum) == n_cols)
+  }) == TRUE)
+
+result <- sum(boards[,, winner][bingo[,, winner] == 0]) * draws[i]
+result
+
+rm(i, winner)
+
+# Challenge #4.2 ----
+
+# On the other hand, it might be wise to try a different strategy: let the giant 
+# squid win.
+# You aren't sure how many bingo boards a giant squid could play at once, so 
+# rather than waste time counting its arms, the safe thing to do is to figure 
+# out which board will win last and choose that one. That way, no matter which 
+# boards it picks, it will win for sure.
+# In the above example, the second board is the last to win, which happens after 
+# 13 is eventually called and its middle column is completely marked. If you 
+# were to keep playing until this point, the second board would have a sum of 
+# unmarked numbers equal to 148 for a final score of 148 * 13 = 1924.
+# Figure out which board will win last. Once it wins, what would its final score 
+# be?
+
+bingo       <- replicate(n_boards, matrix(0, 5, 5))
+win_order   <- NULL
+
+for (i in 1:length(draws)) {
+  bingo[which(boards == draws[i])] <- 1
+  
+  winners <- which(apply(bingo, 3, function(x) {
+    any(apply(x, 1, sum) == n_cols) | any(apply(x, 2, sum) == n_cols)
+  }) == TRUE)
+  
+  win_order <- c(win_order, setdiff(winners, win_order))
+  
+  if (length(win_order) == n_boards) {
+    break
+    }
+}
+
+loser <- tail(win_order, 1)
+
+result <- sum(boards[,, loser][bingo[,, loser] == 0]) * draws[i]
 result
 
 rm(list = ls())
