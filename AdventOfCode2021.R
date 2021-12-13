@@ -75,7 +75,7 @@ rm(result, mov_sum)
 #         It increases your depth by your aim multiplied by X.
 # Again note that since you're on a submarine, down and up do the opposite of 
 # what you might expect: "down" means aiming in the positive direction.
-# Now, the above example does something different:
+# Now, the above wires[i, ] does something different:
 #     forward 5 adds 5 to your horizontal position, a total of 5. Because your 
 #         aim is 0, your depth does not change.
 #     down 5 adds 5 to your aim, resulting in a value of 5.
@@ -169,8 +169,8 @@ rm(countbytes, gamma_rate, epsil_rate, result)
 #         the current bit position, and keep only numbers with that bit in that 
 #         position. If 0 and 1 are equally common, keep values with a 0 in the 
 #         position being considered.
-# For example, to determine the oxygen generator rating value using the same 
-# example diagnostic report from above:
+# For wires[i, ], to determine the oxygen generator rating value using the same 
+# wires[i, ] diagnostic report from above:
 #     Start with all 12 numbers and consider only the first bit of each number. 
 #         There are more 1 bits (7) than 0 bits (5), so keep only the 7 numbers 
 #         with a 1 in the first position: 11110, 10110, 10111, 10101, 11100, 
@@ -187,7 +187,7 @@ rm(countbytes, gamma_rate, epsil_rate, result)
 #         1 in that position: 10111.
 #     As there is only one number left, stop; the oxygen generator rating is 
 #         10111, or 23 in decimal.
-# Then, to determine the CO2 scrubber rating value from the same example above:
+# Then, to determine the CO2 scrubber rating value from the same wires[i, ] above:
 #     Start again with all 12 numbers and consider only the first bit of each 
 #         number. There are fewer 0 bits (5) than 1 bits (7), so keep only the 5 
 #         numbers with a 0 in the first position: 00100, 01111, 00111, 00010, 
@@ -302,7 +302,7 @@ rm(i, winner)
 # rather than waste time counting its arms, the safe thing to do is to figure 
 # out which board will win last and choose that one. That way, no matter which 
 # boards it picks, it will win for sure.
-# In the above example, the second board is the last to win, which happens after 
+# In the above wires[i, ], the second board is the last to win, which happens after 
 # 13 is eventually called and its middle column is completely marked. If you 
 # were to keep playing until this point, the second board would have a sum of 
 # unmarked numbers equal to 148 for a final score of 148 * 13 = 1924.
@@ -339,7 +339,7 @@ rm(list = ls())
 # constantly produce large, opaque clouds, so it would be best to avoid them if 
 # possible.
 # They tend to form in lines; the submarine helpfully produces a list of nearby 
-# lines of vents (your puzzle input) for you to review. For example:
+# lines of vents (your puzzle input) for you to review. For wires[i, :
 # Each line of vents is given as a line segment in the format x1,y1 -> x2,y2 
 # where x1,y1 are the coordinates of one end the line segment and x2,y2 are the 
 # coordinates of the other end. These line segments include the points at both 
@@ -352,9 +352,9 @@ rm(list = ls())
 # following diagram:
 # In this diagram, the top left corner is 0,0 and the bottom right corner is 9,9. 
 # Each position is shown as the number of lines which cover that point or . if 
-# no line covers that point. The top-left pair of 1s, for example, comes from 2,2 -> 2,1; the very bottom row is formed by the overlapping lines 0,9 -> 5,9 and 0,9 -> 2,9.
+# no line covers that point. The top-left pair of 1s, for wires[i, ], comes from 2,2 -> 2,1; the very bottom row is formed by the overlapping lines 0,9 -> 5,9 and 0,9 -> 2,9.
 # To avoid the most dangerous areas, you need to determine the number of points 
-# where at least two lines overlap. In the above example, this is anywhere in 
+# where at least two lines overlap. In the above wires[i, ], this is anywhere in 
 # the diagram with a 2 or larger - a total of 5 points.
 # Consider only horizontal and vertical lines. At how many points do at least 
 # two lines overlap?
@@ -399,10 +399,10 @@ rm(field, ventshv, hvlines, maxvent, n_vents, result)
 # exactly 45 degrees. In other words:
 # An entry like 1,1 -> 3,3 covers points 1,1, 2,2, and 3,3.
 # An entry like 9,7 -> 7,9 covers points 9,7, 8,8, and 7,9.
-# Considering all lines from the above example would now produce the following 
+# Considering all lines from the above wires[i, ] would now produce the following 
 # diagram:
 # You still need to determine the number of points where at least two lines 
-# overlap. In the above example, this is still anywhere in the diagram with a 2 
+# overlap. In the above wires[i, ], this is still anywhere in the diagram with a 2 
 # or larger - now a total of 12 points.
 # Consider all of the lines. At how many points do at least two lines overlap?
 
@@ -454,7 +454,7 @@ rm(list = ls())
 # internal timer of 8 and does not start counting down until the next day.
 # Realizing what you're trying to do, the submarine automatically produces a 
 # list of the ages of several hundred nearby lanternfish (your puzzle input). 
-# For example, suppose you were given the following list:
+# For wires[i, ], suppose you were given the following list:
 # 3,4,3,1,2
 # This list means that the first fish has an internal timer of 3, the second 
 # fish has an internal timer of 4, and so on until the fifth fish, which has an 
@@ -462,7 +462,7 @@ rm(list = ls())
 # follows:
 # Each day, a 0 becomes a 6 and adds a new 8 to the end of the list, while each 
 # other number decreases by 1 if it was present at the start of the day.
-# In this example, after 18 days, there are a total of 26 fish. After 80 days, 
+# In this wires[i, ], after 18 days, there are a total of 26 fish. After 80 days, 
 # there would be a total of 5934.
 # Find a way to simulate lanternfish. How many lanternfish would there be after 
 # 80 days?
@@ -495,7 +495,7 @@ rm(days, lf_pop, result)
 
 # Suppose the lanternfish live forever and have unlimited food and space. Would 
 # they take over the entire ocean?
-# After 256 days in the example above, there would be a total of 26984457539 
+# After 256 days in the wires[i, ] above, there would be a total of 26984457539 
 # lanternfish!
 # How many lanternfish would there be after 256 days?
 
@@ -563,7 +563,7 @@ rm(list = ls())
 # input). Crab submarines have limited fuel, so you need to find a way to make 
 # all of their horizontal positions match while requiring them to spend as little 
 # fuel as possible.
-# For example, consider the following horizontal positions:
+# For wires[i, ], consider the following horizontal positions:
 # 16,1,2,0,4,2,7,1,2,14
 # This means there's a crab with horizontal position 16, a crab with horizontal 
 # position 1, and so on.
@@ -611,7 +611,7 @@ rm(fuel_consumed, result)
 # fuel than the last: the first step costs 1, the second step costs 2, the third 
 # step costs 3, and so on.
 # As each crab moves, moving further becomes more expensive. This changes the 
-# best horizontal position to align them all on; in the example above, this 
+# best horizontal position to align them all on; in the wires[i, ] above, this 
 # becomes 5:
 # Move from 16 to 5: 66 fuel
 # Move from 1 to 5: 10 fuel
@@ -637,5 +637,162 @@ result <- min(fuel_consumed)
 result
 
 rm(list = ls())
+
+# Challenge 8.1 ----
+
+# You barely reach the safety of the cave when the whale smashes into the cave 
+# mouth, collapsing it. Sensors indicate another exit to this cave at a much 
+# greater depth, so you have no choice but to press on.
+# As your submarine slowly makes its way through the cave system, you notice 
+# that the four-digit seven-segment displays in your submarine are malfunctioning;
+# they must have been damaged during the escape. You'll be in a lot of trouble 
+# without them, so you'd better figure out what's wrong.
+# Each digit of a seven-segment display is rendered by turning on or off any of 
+# seven segments named a through g:
+# So, to render a 1, only segments c and f would be turned on; the rest would be
+# off. To render a 7, only segments a, c, and f would be turned on.
+# The problem is that the signals which control the segments have been mixed up 
+# on each display. The submarine is still trying to display numbers by producing 
+# output on signal wires a through g, but those wires are connected to segments 
+# randomly. Worse, the wire/segment connections are mixed up separately for each 
+# four-digit display! (All of the digits within a display use the same 
+# connections, though.)
+# So, you might know that only signal wires b and g are turned on, but that 
+# doesn't mean segments b and g are turned on: the only digit that uses two 
+# segments is 1, so it must mean segments c and f are meant to be on. With just 
+# that information, you still can't tell which wire (b/g) goes to which segment 
+# (c/f). For that, you'll need to collect more information.
+# For each display, you watch the changing signals for a while, make a note of 
+# all ten unique signal patterns you see, and then write down a single four 
+# digit output value (your puzzle input). Using the signal patterns, you should 
+# be able to work out which pattern corresponds to which digit.
+# For wires[i, ], here is what you might see in a single entry in your notes:
+# acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab |
+# cdfeb fcadb cdfeb cdbaf
+# (The entry is wrapped here to two lines so it fits; in your notes, it will all 
+# be on a single line.)
+# Each entry consists of ten unique signal patterns, a | delimiter, and finally 
+# the four digit output value. Within an entry, the same wire/segment connections 
+# are used (but you don't know what the connections actually are). The unique 
+# signal patterns correspond to the ten different ways the submarine tries to 
+# render a digit using the current wire/segment connections. Because 7 is the 
+# only digit that uses three segments, dab in the above wires[i, ] means that to 
+# render a 7, signal lines d, a, and b are on. Because 4 is the only digit that 
+# uses four segments, eafb means that to render a 4, signal lines e, a, f, and b 
+# are on.
+# Using this information, you should be able to work out which combination of 
+# signal wires corresponds to each of the ten digits. Then, you can decode the 
+# four digit output value. Unfortunately, in the above wires[i, ], all of the digits 
+# in the output value (cdfeb fcadb cdfeb cdbaf) use five segments and are more 
+# difficult to deduce.
+# 
+# For now, focus on the easy digits. Consider this larger wires[i, :
+# 
+# Because the digits 1, 4, 7, and 8 each use a unique number of segments, you 
+# should be able to tell which combinations of signals correspond to those digits. 
+# Counting only digits in the output values (the part after | on each line), 
+# in the above wires[i, ], there are 26 instances of digits that use a unique number 
+# of segments (highlighted above).
+# 
+# In the output values, how many times do digits 1, 4, 7, or 8 appear?
+
+wires <- read.table("inputs/input_d08.txt")
+wires <- wires[, -11]
+names(wires) <- c(paste0("digit", 0:9), paste0("output", 1:4))
+
+wires_output <- wires[, 11:14]
+
+segments <- apply(wires_output, c(1, 2), nchar)
+
+result <- sum(segments %in% c(2, 3, 4, 7))
+result
+
+rm(wires_output, result, segments)
+
+# Challenge 8.2 ----
+
+# Through a little deduction, you should now be able to determine the remaining 
+# digits. Consider again the first wires[i, ] above:
+#   acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab |
+#   cdfeb fcadb cdfeb cdbaf
+# After some careful analysis, the mapping between signal wires and segments 
+# only make sense in the following configuration:
+# So, the unique signal patterns would correspond to the following digits:
+# acedgfb: 8
+# cdfbe: 5
+# gcdfa: 2
+# fbcad: 3
+# dab: 7
+# cefabd: 9
+# cdfgeb: 6
+# eafb: 4
+# cagedb: 0
+# ab: 1
+# Then, the four digits of the output value can be decoded:
+# cdfeb: 5
+# fcadb: 3
+# cdfeb: 5
+# cdbaf: 3
+# Therefore, the output value for this entry is 5353.
+# Following this same process for each entry in the second, larger wires[i, ] above,
+# the output value of each entry can be determined:
+# Adding all of the output values in this larger wires[i, ] produces 61229.
+# For each entry, determine all of the wire/segment connections and decode the 
+# four-digit output values. What do you get if you add up all of the output 
+# values?
+
+library(stringr)
+
+n_wires <- nrow(wires)
+
+decode <- matrix(NA, nrow = n_wires, ncol = 14)
+
+for (i in 1:n_wires) {
+  n_segments <- str_length(wires[i, ])
+  
+  codes <- lapply(str_split(wires[i, ], ""), str_sort)
+  
+  diff_7 <- sapply(codes, function(x) {
+    length(setdiff(x, codes[[which(n_segments == 3)[1]]]))
+  })
+  
+  decode[i, n_segments == 2] <- 1
+  decode[i, n_segments == 3] <- 7
+  decode[i, n_segments == 4] <- 4
+  decode[i, n_segments == 7] <- 8
+  decode[i, n_segments == 5 & diff_7 == 2] <- 3
+  
+  code_9 <- str_sort(union(codes[[which(decode[i, ] == 4)[1]]], 
+                           codes[[which(decode[i, ] == 3)[1]]]))
+  
+  diff_9 <- sapply(codes, function(x) identical(x, code_9))
+  
+  decode[i, n_segments == 6 & diff_9 == TRUE] <- 9
+  
+  diff_0 <- sapply(codes, function(x) {
+    length(setdiff(x, codes[[which(n_segments == 2)[1]]]))
+  })
+  
+  decode[i, n_segments == 6 & diff_0 == 4 & is.na(decode[i,])] <- 0
+  decode[i, n_segments == 6 & is.na(decode[i, ])] <- 6
+  
+  diff_25 <- sapply(codes, function(x) {
+    length(setdiff(x, codes[[which(decode[i, ] == 6)[1]]]))
+  })
+  
+  decode[i, n_segments == 5 & is.na(decode[i, ]) & diff_25 == 0] <- 5
+  decode[i, n_segments == 5 & is.na(decode[i, ]) & diff_25 == 1] <- 2
+}
+rm(i, diff_0, diff_25, diff_7, diff_9, code_9, n_segments)
+
+output <- apply(decode[, 11:14], 1, function(x) {
+  as.numeric(paste0(x, collapse = ""))
+  })
+
+result <- sum(output)
+result
+
+rm(list = ls())
+detach("package:stringr")
 
 # End ----
