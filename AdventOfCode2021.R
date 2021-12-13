@@ -333,7 +333,7 @@ result
 
 rm(list = ls())
 
-# Challenge 5.1 ----
+# Challenge #5.1 ----
 
 # You come across a field of hydrothermal vents on the ocean floor! These vents 
 # constantly produce large, opaque clouds, so it would be best to avoid them if 
@@ -491,7 +491,7 @@ result
 
 rm(days, lf_pop, result)
 
-# Challenge 6.2 ----
+# Challenge #6.2 ----
 
 # Suppose the lanternfish live forever and have unlimited food and space. Would 
 # they take over the entire ocean?
@@ -546,7 +546,7 @@ sprintf("%1.0f", result)
 
 rm(list = ls())
 
-# Challenge 7.1 ----
+# Challenge #7.1 ----
 
 # A giant whale has decided your submarine is its next meal, and it's much 
 # faster than you are. There's nowhere to run!
@@ -602,7 +602,7 @@ result
 
 rm(fuel_consumed, result)
 
-# Challenge 7.2 ----
+# Challenge #7.2 ----
 
 # The crabs don't seem interested in your proposed solution. Perhaps you 
 # misunderstand crab engineering?
@@ -638,7 +638,7 @@ result
 
 rm(list = ls())
 
-# Challenge 8.1 ----
+# Challenge #8.1 ----
 
 # You barely reach the safety of the cave when the whale smashes into the cave 
 # mouth, collapsing it. Sensors indicate another exit to this cave at a much 
@@ -709,7 +709,7 @@ result
 
 rm(wires_output, result, segments)
 
-# Challenge 8.2 ----
+# Challenge #8.2 ----
 
 # Through a little deduction, you should now be able to determine the remaining 
 # digits. Consider again the first wires[i, ] above:
@@ -794,5 +794,146 @@ result
 
 rm(list = ls())
 detach("package:stringr")
+
+# Challenge #9.1 ----
+
+# These caves seem to be lava tubes. Parts are even still volcanically active; 
+# small hydrothermal vents release smoke into the caves that slowly settles like 
+# rain.
+# If you can model how the smoke flows through the caves, you might be able to 
+# avoid it and be that much safer. The submarine generates a heightmap of the 
+# floor of the nearby caves for you (your puzzle input).
+# Smoke flows to the lowest point of the area it's in. For example, consider the 
+# following heightmap:
+# 2199943210
+# 3987894921
+# 9856789892
+# 8767896789
+# 9899965678
+# Each number corresponds to the height of a particular location, where 9 is the 
+# highest and 0 is the lowest a location can be.
+# Your first goal is to find the low points - the locations that are lower than 
+# any of its adjacent locations. Most locations have four adjacent locations 
+# (up, down, left, and right); locations on the edge or corner of the map have 
+# three or two adjacent locations, respectively. (Diagonal locations do not count 
+# as adjacent.)
+# In the above example, there are four low points, all highlighted: two are in 
+# the first row (a 1 and a 0), one is in the third row (a 5), and one is in the 
+# bottom row (also a 5). All other locations on the heightmap have some lower 
+# adjacent location, and so are not low points.
+# The risk level of a low point is 1 plus its height. In the above example, the 
+# risk levels of the low points are 2, 1, 6, and 6. The sum of the risk levels 
+# of all low points in the heightmap is therefore 15.
+# 
+# Find all of the low points on your heightmap. What is the sum of the risk 
+# levels of all low points on your heightmap?
+
+columns   <- nchar(readLines("inputs/input_d09.txt", n = 1))
+heightmap <- read.fwf("inputs/input_d09.txt", widths = rep(1, columns))
+
+adjacent <- matrix(c(0, 1, 1, 0, 0, -1, -1, 0), ncol = 2, byrow = TRUE)
+
+lowest   <- matrix(NA, ncol = columns, nrow = nrow(heightmap))
+
+for (i in 1:(nrow(heightmap))) {
+  for (j in 1:columns) {
+    adj_coor <- matrix(rep(c(i, j), each = 4), nrow = 4) + adjacent
+    exclude  <- apply(adj_coor, 1, function(x) any(x == 0 | x > columns))
+    adj_coor <- adj_coor[!exclude, ]
+    if(all(heightmap[i, j] < heightmap[adj_coor])) {
+      lowest[i, j] <- 1
+    } else {
+      lowest[i, j] <- 0
+    }
+  }
+}
+rm(i, j, exclude, adj_coor)
+
+result <- sum(heightmap[lowest == 1] + 1)
+result
+
+rm(result)
+
+# Challenge #9.2 ----
+
+# Next, you need to find the largest basins so you know what areas are most 
+# important to avoid.
+# A basin is all locations that eventually flow downward to a single low point. 
+# Therefore, every low point has a basin, although some basins are very small. 
+# Locations of height 9 do not count as being in any basin, and all other 
+# locations will always be part of exactly one basin.
+# The size of a basin is the number of locations within the basin, including the 
+# low point. The example above has four basins.
+# The top-left basin, size 3:
+# 2199943210
+# 3987894921
+# 9856789892
+# 8767896789
+# 9899965678
+# The top-right basin, size 9:
+# 2199943210
+# 3987894921
+# 9856789892
+# 8767896789
+# 9899965678
+# The middle basin, size 14:
+# 2199943210
+# 3987894921
+# 9856789892
+# 8767896789
+# 9899965678
+# The bottom-right basin, size 9:
+# 2199943210
+# 3987894921
+# 9856789892
+# 8767896789
+# 9899965678
+# Find the three largest basins and multiply their sizes together. In the above 
+# example, this is 9 * 14 * 9 = 1134.
+# What do you get if you multiply together the sizes of the three largest 
+# basins?
+
+highest    <- ifelse(heightmap == 9, -99, 0)
+n_basins   <- sum(lowest)
+basin_coor <- which(lowest == 1, arr.ind = TRUE)
+basins     <- highest
+
+for (i in 1:n_basins) {
+  basins[basin_coor[i, 1], basin_coor[i, 2]] <- i
+  
+  coor_start <- basin_coor[i, ]
+  
+  adj_coor <- matrix(rep(coor_start, each = 4), nrow = 4) + adjacent
+  exclude  <- apply(adj_coor, 1, function(x) {
+    ifelse((x[1] == 0 | x[1] > nrow(heightmap) | 
+              (x[2] == 0 | x[2] > columns)), TRUE, FALSE)
+    })
+  adj_coor <- adj_coor[!exclude, ]
+  
+  while (any(basins[adj_coor] == 0)) {
+    coor_new <- adj_coor[basins[adj_coor] == 0,]
+    if (is.vector(coor_new)) {
+      coor_new <- t(as.matrix(coor_new))
+    }
+    basins[coor_new] <- i
+    adj_coor <- coor_new[rep(seq_len(nrow(coor_new)), each = 4), ] + 
+      adjacent[rep(1:4, times = nrow(coor_new)), ]
+    exclude  <- apply(adj_coor, 1, function(x) {
+      ifelse((x[1] == 0 | x[1] > nrow(heightmap) | 
+                (x[2] == 0 | x[2] > columns)), TRUE, FALSE)
+    })
+    adj_coor <- adj_coor[!exclude, ]
+    adj_coor <- adj_coor[!duplicated(adj_coor), ]
+  }
+}
+rm(i, exclude, coor_start, coor_new, adj_coor, adjacent, basin_coor, 
+   n_basins, columns)
+
+basins_size <- table(c(basins[basins != -99]))
+
+result <- prod(sort(basins_size, decreasing = TRUE)[1:3])
+result
+
+rm(list = ls())
 
 # End ----
