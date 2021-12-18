@@ -1133,4 +1133,188 @@ result
 rm(list = ls()) 
 detach("package:stringr")
 
+# Challenge #11.1 ----
+
+# You enter a large cavern full of rare bioluminescent dumbo octopuses! They 
+# seem to not like the Christmas lights on your submarine, so you turn them off 
+# for now.
+# There are 100 octopuses arranged neatly in a 10 by 10 grid. Each octopus 
+# slowly gains energy over time and flashes brightly for a moment when its 
+# energy is full. Although your lights are off, maybe you could navigate through 
+# the cave without disturbing the octopuses if you could predict when the 
+# flashes of light will happen.
+# Each octopus has an energy level - your submarine can remotely measure the 
+# energy level of each octopus (your puzzle input). For example:
+# 5483143223
+# 2745854711
+# 5264556173
+# 6141336146
+# 6357385478
+# 4167524645
+# 2176841721
+# 6882881134
+# 4846848554
+# 5283751526
+# The energy level of each octopus is a value between 0 and 9. Here, the 
+# top-left octopus has an energy level of 5, the bottom-right one has an energy 
+# level of 6, and so on.
+# You can model the energy levels and flashes of light in steps. During a single 
+# step, the following occurs:
+# First, the energy level of each octopus increases by 1.
+# Then, any octopus with an energy level greater than 9 flashes. This increases 
+# the energy level of all adjacent octopuses by 1, including octopuses that are 
+# diagonally adjacent. If this causes an octopus to have an energy level greater 
+# than 9, it also flashes. This process continues as long as new octopuses keep 
+# having their energy level increased beyond 9. (An octopus can only flash at 
+# most once per step.)
+# Finally, any octopus that flashed during this step has its energy level set to 
+# 0, as it used all of its energy to flash.
+# Adjacent flashes can cause an octopus to flash on a step even if it begins 
+# that step with very little energy. Consider the middle octopus with 1 energy 
+# in this situation:
+# Before any steps:
+# 11111
+# 19991
+# 19191
+# 19991
+# 11111
+# After step 1:
+# 34543
+# 40004
+# 50005
+# 40004
+# 34543
+# After step 2:
+# 45654
+# 51115
+# 61116
+# 51115
+# 45654
+# An octopus is highlighted when it flashed during the given step.
+# Given the starting energy levels of the dumbo octopuses in your cavern, 
+# simulate 100 steps. How many total flashes are there after 100 steps?
+
+columns  <- nchar(readLines("inputs/input_d11.txt", n = 1))
+octopus  <- read.fwf("inputs/input_d11.txt", widths = rep(1, columns))
+adjacent <- matrix(c(0, 1, 1, 0, 
+                     0, -1, -1, 0, 
+                     1, 1, -1, -1, 
+                     1, -1, -1, 1), ncol = 2, byrow = TRUE) 
+
+octopus_0 <- octopus
+
+flashes <- 0
+
+for (n in 1:100) {
+  
+  octopus <- octopus + 1
+  
+  while (any(octopus == 10)) {
+    loc10 <- which(octopus == 10, arr.ind = TRUE)
+    
+    if (is.vector(loc10)) {
+      loc10 <- t(as.matrix(loc10))
+    }
+    
+    octopus[octopus == 10] <- octopus[octopus == 10] + 1 
+    
+    for (i in 1:nrow(loc10)) {
+      adj_coor <- matrix(rep(loc10[i, ], each = 8), nrow = 8) + adjacent
+      exclude  <- apply(adj_coor, 1, function(x) {
+        ifelse((x[1] == 0 | x[1] > nrow(octopus) | 
+                  (x[2] == 0 | x[2] > columns)), TRUE, FALSE)
+      })
+      adj_coor <- adj_coor[!exclude, ]
+      
+      octopus[adj_coor][octopus[adj_coor] < 10] <- octopus[adj_coor][octopus[adj_coor] < 10] + 1
+    }
+  }
+  
+  octopus[octopus >= 10] <- 0
+  flashes <- flashes + sum(octopus == 0)
+}
+
+rm(i, n, adj_coor, loc10, exclude)
+
+result <- flashes
+result
+
+rm(result, flashes)
+
+# Challenge #11.2 ----
+
+# It seems like the individual flashes aren't bright enough to navigate. However, 
+# you might have a better option: the flashes seem to be synchronizing!
+# 
+# In the example above, the first time all octopuses flash simultaneously is 
+# step 195:
+# After step 194:
+# 6988888888
+# 9988888888
+# 8888888888
+# 8888888888
+# 8888888888
+# 8888888888
+# 8888888888
+# 8888888888
+# 8888888888
+# 8888888888
+# After step 195:
+# 0000000000
+# 0000000000
+# 0000000000
+# 0000000000
+# 0000000000
+# 0000000000
+# 0000000000
+# 0000000000
+# 0000000000
+# 0000000000
+# If you can calculate the exact moments when the octopuses will all flash 
+# simultaneously, you should be able to navigate through the cavern. What is 
+# the first step during which all octopuses flash?
+
+octopus <- octopus_0
+
+step     <- 0
+nflashes <- 0
+
+while (nflashes < prod(dim(octopus))) {
+  
+  step <- step + 1
+  
+  octopus <- octopus + 1
+  
+  while (any(octopus == 10)) {
+    loc10 <- which(octopus == 10, arr.ind = TRUE)
+    
+    if (is.vector(loc10)) {
+      loc10 <- t(as.matrix(loc10))
+    }
+    
+    octopus[octopus == 10] <- octopus[octopus == 10] + 1 
+    
+    for (i in 1:nrow(loc10)) {
+      adj_coor <- matrix(rep(loc10[i, ], each = 8), nrow = 8) + adjacent
+      exclude  <- apply(adj_coor, 1, function(x) {
+        ifelse((x[1] == 0 | x[1] > nrow(octopus) | 
+                  (x[2] == 0 | x[2] > columns)), TRUE, FALSE)
+      })
+      adj_coor <- adj_coor[!exclude, ]
+      
+      octopus[adj_coor][octopus[adj_coor] < 10] <- octopus[adj_coor][octopus[adj_coor] < 10] + 1
+    }
+  }
+  
+  octopus[octopus >= 10] <- 0
+  nflashes <- sum(octopus == 0)
+}
+
+rm(i, adj_coor, loc10, exclude)
+
+result <- step
+result
+
+rm(list = ls())
+
 # End ----
